@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <script src="{{ url_for('static', filename='js/roslib.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ros3d.min.js') }}"></script>
+
+    <script type="text/javascript" type="text/javascript">
+        var ip = ""
+        var addTwoNumber = null
+        document.onreadystatechange = () => {
+            if (document.readyState === 'complete') {
+                ip = location.host;
+                ip = ip.substring(0, ip.indexOf(':'));
+                console.log(ip)
+
+                var ros = new ROSLIB.Ros({
+                    url: 'ws://' + '192.168.68.108' + ':9090'
+                });
+
+                ros.on('connection', function () {
+                    document.getElementById("status").innerHTML = "Connected";
+                });
+
+                ros.on('error', function (error) {
+                    document.getElementById("status").innerHTML = "Error";
+                });
+
+                ros.on('close', function () {
+                    document.getElementById("status").innerHTML = "Closed";
+                });
+
+                var listener = new ROSLIB.Topic({
+                    ros: ros,
+                    name: '/chatter',
+                    messageType: 'std_msgs/String'
+                });
+
+                listener.subscribe(function (message) {
+                    console.log('Received message on ' + listener.name + ': ' + message.data);
+
+                });
+
+
+                addTwoNumber = new ROSLIB.Service({
+                    ros: ros,
+                    name: '/add_two_ints',
+                    serviceType: 'tutorial/AddTwoInts'
+                })
+
+                viewer3d = new ROS3D.Viewer({
+                    divID: 'map3d',
+                    width: 800,
+                    height: 600,
+                    antialias: true
+                });
+        
+                var tfClient = new ROSLIB.TFClient({
+                    ros: ros,
+                    angularThres: 0.01,
+                    transThres: 0.01,
+                    rate: 10.0,
+                    fixedFrame: 'map',
+                    serverName: 'tf2_web_republisher'
+                });
+        
+                var laserScan = new ROS3D.LaserScan({
+                        ros: ros,
+                        topic: 'scan',
+                        tfClient: tfClient,
+                        rootObject: viewer3d.scene,
+                        material: {
+                            color: 0x880000,
+                            size: 0.1
+                        }
+                    })
+                    var tfClientM = new ROSLIB.TFClient({
+                        ros: ros,
+                        angularThres: 0.01,
+                        transThres: 0.01,
+                        rate: 10.0,
+                        fixedFrame: '/map'
+                    });
+        
+
+                    var imClient = new ROS3D.InteractiveMarkerClient({
+                        ros: ros,
+                        tfClient: tfClientM,
+                        topic: '/simple_marker_tutorial',
+                        camera: viewer3d.camera,
+                        rootObject: viewer3d.selectableObjects
+                    });
+        
+
+            }
+
+        };
+
+        function addTwoNum() {
+            var addRequest = new ROSLIB.ServiceRequest({
+                a: 1,
+                b: 2
+            });
+
+            addTwoNumber.callService(addRequest, function (result) {
+                console.log(result)
+            })
+            }
+
+  
+
+    </script>
+</head>
+
+<body>
+    <h1>Simple ROS User Interface</h1>
+    <p>Connection status: <span id="status"></span></p>
+    <p>Last /txt_msg received: <span id="msg"></span></p>
+    <div id="map3d" class="col-8">
+    </div>
+    <button type="button" class="btn btn-danger" onclick="addTwoNum()">
+    Add
+    </button>
+    </body>
+    
+
+</html>
