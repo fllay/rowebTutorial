@@ -72,6 +72,22 @@
               size: 0.1,
             },
           });
+
+          var tfClientM = new ROSLIB.TFClient({
+            ros: ros,
+            angularThres: 0.01,
+            transThres: 0.01,
+            rate: 10.0,
+            fixedFrame: "/map",
+          });
+
+          var imClient = new ROS3D.InteractiveMarkerClient({
+            ros: ros,
+            tfClient: tfClientM,
+            topic: "/simple_marker_tutorial",
+            camera: viewer3d.camera,
+            rootObject: viewer3d.selectableObjects,
+          });
         }
       };
 
