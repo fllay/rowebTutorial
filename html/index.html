@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <script src="{{ url_for('static', filename='js/roslib.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ros3d.min.js') }}"></script>
     <script type="text/javascript" type="text/javascript">
       var ip = "";
       var cmdVel = null;
@@ -43,6 +44,33 @@
             ros: ros,
             name: "/cmd_vel",
             messageType: "geometry_msgs/Twist",
+          });
+
+          viewer3d = new ROS3D.Viewer({
+            divID: "map3d",
+            width: 800,
+            height: 600,
+            antialias: true,
+          });
+
+          var tfClient = new ROSLIB.TFClient({
+            ros: ros,
+            angularThres: 0.01,
+            transThres: 0.01,
+            rate: 10.0,
+            fixedFrame: "map",
+            serverName: "tf2_web_republisher",
+          });
+
+          var laserScan = new ROS3D.LaserScan({
+            ros: ros,
+            topic: "scan",
+            tfClient: tfClient,
+            rootObject: viewer3d.scene,
+            material: {
+              color: 0x880000,
+              size: 0.1,
+            },
           });
         }
       };
@@ -133,6 +161,7 @@
     <h1>Simple ROS User Interface</h1>
     <p>Connection status: <span id="status"></span></p>
     <p>Last /txt_msg received: <span id="msg"></span></p>
+    <div id="map3d" class="col-8"></div>
     <button onclick="moveup()">UP</button>
     <button onclick="movedown()">DOWN</button>
     <button onclick="moveleft()">LEFT</button>
