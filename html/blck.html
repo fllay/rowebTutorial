@@ -329,7 +329,7 @@
         custom="PROCEDURE"
       ></category>
       <category name="ROS" colour="%{BKY_TEXTS_HUE}">
-
+        <block type="rosinit"></block>
       </category>
     </xml>
 
@@ -399,7 +399,9 @@
       async function save() {
         var xml = Blockly.Xml.workspaceToDom(demoWorkspace);
         console.log(xml);
-        const json = JSON.stringify({ code: (new XMLSerializer()).serializeToString(xml) });
+        const json = JSON.stringify({
+          code: new XMLSerializer().serializeToString(xml),
+        });
         console.log(json);
         //const res = await axios.post("run", json);
         const res = await axios.post("save", json, {
@@ -412,7 +414,7 @@
       }
 
       async function load() {
-        const json = JSON.stringify({ });
+        const json = JSON.stringify({});
         console.log(json);
         //const res = await axios.post("run", json);
         const res = await axios.post("load", json, {
@@ -420,13 +422,31 @@
             "Content-Type": "application/json",
           },
         });
-        console.log(res.data.code)
+        console.log(res.data.code);
         Blockly.mainWorkspace.clear();
-        Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(res.data.code), Blockly.mainWorkspace);
+        Blockly.Xml.domToWorkspace(
+          Blockly.Xml.textToDom(res.data.code),
+          Blockly.mainWorkspace
+        );
         console.log(res);
       }
 
-      
+      Blockly.Blocks["rosinit"] = {
+        init: function () {
+          this.appendDummyInput().appendField("ROS node start");
+          this.setPreviousStatement(true, null);
+          this.setNextStatement(true, null);
+          this.setColour(230);
+          this.setTooltip("");
+          this.setHelpUrl("");
+        },
+      };
+
+      Blockly.Python["rosinit"] = function (block) {
+        // TODO: Assemble Python into code variable.
+        var code = "...\n";
+        return code;
+      };
       
     </script>
   </body>
