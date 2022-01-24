@@ -38,6 +38,8 @@
       <tr>
         <button onclick="run()">Run</button>
         <button onclick="stop()">Stop</button>
+        <button onclick="save()">Save</button>
+        <button onclick="load()">Load</button>
       </tr>
       <tr>
         <td id="blocklyArea"></td>
@@ -378,7 +380,6 @@
         });
 
         console.log(res);
-
       }
 
       async function stop() {
@@ -391,6 +392,37 @@
 
         console.log(res);
       }
+
+      async function save() {
+        var xml = Blockly.Xml.workspaceToDom(demoWorkspace);
+        console.log(xml);
+        const json = JSON.stringify({ code: (new XMLSerializer()).serializeToString(xml) });
+        console.log(json);
+        //const res = await axios.post("run", json);
+        const res = await axios.post("save", json, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log(res);
+      }
+
+      async function load() {
+        const json = JSON.stringify({ });
+        console.log(json);
+        //const res = await axios.post("run", json);
+        const res = await axios.post("load", json, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(res.data.code)
+        Blockly.mainWorkspace.clear();
+        Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(res.data.code), Blockly.mainWorkspace);
+        console.log(res);
+      }
+      
     </script>
   </body>
 </html>

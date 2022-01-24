@@ -57,6 +57,40 @@ def stop_python():
    os.killpg(os.getpgid(pp.pid),  signal.SIGTERM)
    return make_response(jsonify(status="OK"), 200)
 
+@app.route('/save', methods=['GET', 'POST'])
+def save_blockly():
+    content_type = request.headers.get('Content-Type')
+    global pp
+    if (content_type == 'application/json'):
+        json = request.json
+        print(json["code"])
+        save_path = '/home/pi/tutorial'
+        name_of_file = "test1"
+        completeName = os.path.join(save_path, name_of_file+".xml")         
+        file1 = open(completeName, "w")
+        file1.write(json["code"])
+        file1.close()
+        return make_response(jsonify(status="OK"), 200)
+    else:
+        return 'Content-Type not supported!'
+
+@app.route('/load', methods=['GET', 'POST'])
+def load_blockly():
+    content_type = request.headers.get('Content-Type')
+    global pp
+    if (content_type == 'application/json'):
+        json = request.json
+        save_path = '/home/pi/tutorial'
+        name_of_file = "test1"
+        completeName = os.path.join(save_path, name_of_file+".xml")         
+        with open(completeName) as f:
+           contents = f.read()
+           print(contents)
+        return make_response(jsonify(status="OK", code=contents), 200)
+    else:
+        return 'Content-Type not supported!'
+
+
 
 if __name__ == '__main__':
    app.run(host='0.0.0.0', port="9112")
