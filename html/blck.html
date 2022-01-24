@@ -330,6 +330,8 @@
       ></category>
       <category name="ROS" colour="%{BKY_TEXTS_HUE}">
         <block type="rosinit"></block>
+        <block type="rosloop"></block>
+        <block type="rossleep"></block>
       </category>
     </xml>
 
@@ -444,10 +446,56 @@
 
       Blockly.Python["rosinit"] = function (block) {
         // TODO: Assemble Python into code variable.
-        var code = "...\n";
+        var code =
+          "from geometry_msgs.msg import Twist\nfrom std_msgs.msg import String\nimport rospy\nimport time\n";
+        code = code + "rospy.init_node('blocky_node', anonymous=True)\n";
         return code;
       };
-      
+
+      Blockly.Blocks["rosloop"] = {
+        init: function () {
+          this.appendDummyInput().appendField("ROS LOOP");
+          this.appendStatementInput("input").setCheck(null);
+          this.setPreviousStatement(true, null);
+          this.setNextStatement(true, null);
+          this.setColour(230);
+          this.setTooltip("");
+          this.setHelpUrl("");
+        },
+      };
+
+      Blockly.Python["rosloop"] = function (block) {
+        var statements_input = Blockly.Python.statementToCode(block, "input");
+        // TODO: Assemble Python into code variable.
+        var code = "while not rospy.is_shutdown():\n";
+        code = code + statements_input;
+        return code;
+      };
+
+      Blockly.Blocks["rossleep"] = {
+        init: function () {
+          this.appendDummyInput().appendField("ROS sleep");
+          this.appendValueInput("time").setCheck(null);
+          this.appendDummyInput().appendField("sec");
+          this.setInputsInline(true);
+          this.setPreviousStatement(true, null);
+          this.setNextStatement(true, null);
+          this.setColour(230);
+          this.setTooltip("");
+          this.setHelpUrl("");
+        },
+      };
+
+      Blockly.Python["rossleep"] = function (block) {
+        var value_time = Blockly.Python.valueToCode(
+          block,
+          "time",
+          Blockly.Python.ORDER_ATOMIC
+        );
+        // TODO: Assemble Python into code variable.
+        var code = "rospy.sleep(" + value_time + ")\n";
+        return code;
+      };
     </script>
   </body>
 </html>
