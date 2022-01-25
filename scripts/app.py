@@ -47,7 +47,7 @@ def run_python():
         pp = subprocess.Popen(['python %s'%(completeName)],stdout = subprocess.PIPE,stderr = subprocess.PIPE,shell=True, preexec_fn=os.setsid)
         out = pp.communicate()[0]
         output = str(out)
-        #print(output)
+        print(output)
         return make_response(jsonify(status="OK"), 200)
     else:
         return 'Content-Type not supported!'
