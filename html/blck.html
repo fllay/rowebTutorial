@@ -332,6 +332,8 @@
         <block type="rosinit"></block>
         <block type="rosloop"></block>
         <block type="rossleep"></block>
+        <block type="publisher_init"></block>
+        <block type="publish"></block>
       </category>
     </xml>
 
@@ -494,6 +496,62 @@
         );
         // TODO: Assemble Python into code variable.
         var code = "rospy.sleep(" + value_time + ")\n";
+        return code;
+      };
+
+      Blockly.Blocks["publisher_init"] = {
+        init: function () {
+          this.appendDummyInput().appendField("ROS Publisher Topic name:");
+          this.appendValueInput("data").setCheck(null);
+          this.setInputsInline(true);
+          this.setOutput(true, null);
+          this.setColour(230);
+          this.setTooltip("");
+          this.setHelpUrl("");
+        },
+      };
+
+      Blockly.Python["publisher_init"] = function (block) {
+        var value_data = Blockly.Python.valueToCode(
+          block,
+          "data",
+          Blockly.Python.ORDER_ATOMIC
+        );
+        // TODO: Assemble Python into code variable.
+        var code =
+          "rospy.Publisher(" + value_data + ", String, queue_size=10)\n";
+        // TODO: Change ORDER_NONE to the correct strength.
+        return [code, Blockly.Python.ORDER_NONE];
+      };
+
+      Blockly.Blocks["publish"] = {
+        init: function () {
+          this.appendDummyInput().appendField("ROS Publish: publisher");
+          this.appendValueInput("pub").setCheck(null);
+          this.appendDummyInput().appendField("data");
+          this.appendValueInput("data").setCheck(null);
+          this.setInputsInline(true);
+          this.setPreviousStatement(true, null);
+          this.setNextStatement(true, null);
+          this.setColour(230);
+          this.setTooltip("");
+          this.setHelpUrl("");
+        },
+      };
+
+      Blockly.Python["publish"] = function (block) {
+        var value_pub = Blockly.Python.valueToCode(
+          block,
+          "pub",
+          Blockly.Python.ORDER_ATOMIC
+        );
+        var value_data = Blockly.Python.valueToCode(
+          block,
+          "data",
+          Blockly.Python.ORDER_ATOMIC
+        );
+        // TODO: Assemble Python into code variable.
+        var code = value_pub + ".publish(" + value_data + ")\n";
         return code;
       };
     </script>
